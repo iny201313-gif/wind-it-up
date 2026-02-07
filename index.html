@@ -5,9 +5,7 @@
 <title>Wind It Up 💗</title>
 
 <style>
-  * {
-    box-sizing: border-box;
-  }
+  * { box-sizing: border-box; }
 
   body {
     margin: 0;
@@ -26,15 +24,8 @@
     text-align: center;
   }
 
-  h1 {
-    color: #b3003b;
-    margin-bottom: 5px;
-  }
-
-  p {
-    color: #800026;
-    font-size: 14px;
-  }
+  h1 { color: #b3003b; }
+  p { color: #800026; font-size: 14px; }
 
   .photo-holder {
     position: relative;
@@ -67,16 +58,12 @@
     box-shadow: 0 10px 20px rgba(0,0,0,0.2);
   }
 
-  .wand-zone {
-    margin-top: 30px;
-  }
-
   .wand {
     width: 200px;
     height: 20px;
     background: #b3003b;
     border-radius: 10px;
-    margin: auto;
+    margin: 30px auto 0;
     cursor: grab;
     user-select: none;
     transform-origin: center center;
@@ -88,7 +75,7 @@
 
 <div class="booth">
   <h1>✨ Wind the Wand ✨</h1>
-  <p>Rotate to reveal memories & hear the voice note</p>
+  <p>Rotate continuously to reveal memories</p>
 
   <div class="photo-holder">
     <div class="photo"><img src="IMG-01.jpg"></div>
@@ -103,9 +90,7 @@
     <div class="photo"><img src="IMG-10.jpg"></div>
   </div>
 
-  <div class="wand-zone">
-    <div class="wand" id="wand"></div>
-  </div>
+  <div class="wand" id="wand"></div>
 </div>
 
 <audio id="voice" src="voice.mp3" preload="auto"></audio>
@@ -116,28 +101,16 @@
   const audio = document.getElementById("voice");
 
   let isDragging = false;
-  let rotation = 0;
   let lastAngle = 0;
+  let rotation = 0;
+  let lastMoveTime = 0;
   let revealed = 0;
-  let isRotating = false;
 
   function angleFromEvent(e) {
-    const rect = wand.getBoundingClientRect();
-    const cx = rect.left + rect.width / 2;
-    const cy = rect.top + rect.height / 2;
-    return Math.atan2(e.clientY - cy, e.clientX - cx) * (180 / Math.PI);
-  }
-
-  function startAudio() {
-    if (audio.paused) {
-      audio.play().catch(() => {});
-    }
-  }
-
-  function stopAudio() {
-    if (!audio.paused) {
-      audio.pause();
-    }
+    const r = wand.getBoundingClientRect();
+    const cx = r.left + r.width / 2;
+    const cy = r.top + r.height / 2;
+    return Math.atan2(e.clientY - cy, e.clientX - cx) * 180 / Math.PI;
   }
 
   wand.addEventListener("mousedown", e => {
@@ -152,33 +125,33 @@
     const delta = angle - lastAngle;
     lastAngle = angle;
 
-    if (Math.abs(delta) > 0.5) {
-      isRotating = true;
-      startAudio();
+    if (Math.abs(delta) > 0.3) {
+      lastMoveTime = Date.now();
+      if (audio.paused) audio.play().catch(() => {});
     }
 
     rotation += delta;
     wand.style.transform = `rotate(${rotation}deg)`;
+  });
 
-    if (
-      Math.abs(rotation) >= (revealed + 1) * 40 &&
-      revealed < photos.length
-    ) {
-      photos[revealed].style.display = "flex";
-      revealed++;
+  document.addEventListener("mouseup", stopAll);
+  document.addEventListener("mouseleave", stopAll);
+
+  function stopAll() {
+    isDragging = false;
+    audio.pause();
+  }
+
+  // 🔥 IMAGE REVEAL BASED ON AUDIO TIME
+  audio.addEventListener("timeupdate", () => {
+    if (!audio.duration) return;
+
+    const progress = audio.currentTime / audio.duration;
+    const shouldReveal = Math.floor(progress * photos.length);
+
+    for (let i = 0; i <= shouldReveal && i < photos.length; i++) {
+      photos[i].style.display = "flex";
     }
-  });
-
-  document.addEventListener("mouseup", () => {
-    isDragging = false;
-    isRotating = false;
-    stopAudio();
-  });
-
-  document.addEventListener("mouseleave", () => {
-    isDragging = false;
-    isRotating = false;
-    stopAudio();
   });
 </script>
 
