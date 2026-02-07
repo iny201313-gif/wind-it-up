@@ -5,7 +5,31 @@
   <title>HAPPY ANNIVERSARY BABYY 💗</title>
 
   <style>
-    * { box-sizing: border-box; }
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      height: 100vh;
+      background: linear-gradient(#ffd1dc, #ff4d6d);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: Arial, sans-serif;
+      overflow: hidden;
+    }
+
+    .booth {
+      width: 90%;
+      max-width: 420px;
+      text-align: center;
+    }
+
+    h1 {
+      color: #b3003b;
+      margin-bottom: 4px;
+    }
 
     .subtitle {
       margin-top: 6px;
@@ -13,157 +37,133 @@
       font-size: 14px;
       font-weight: 500;
     }
+
+    .photo-holder {
+      position: relative;
+      width: 100%;
+      height: 300px;
+      background: #fff0f5;
+      border: 3px dashed #b3003b;
+      border-radius: 20px;
+      margin: 20px 0;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .photo {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      display: none;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .photo img {
+      max-width: 90%;
+      max-height: 90%;
+      object-fit: contain;
+      border-radius: 15px;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+    }
+
+    .wand {
+      width: 200px;
+      height: 20px;
+      background: #b3003b;
+      border-radius: 10px;
+      margin: 30px auto 0;
+      cursor: grab;
+      user-select: none;
+      transform-origin: center center;
+    }
   </style>
-</head>
-
-
-  body {
-    margin: 0;
-    height: 100vh;
-    background: linear-gradient(#ffd1dc, #ff4d6d);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-family: Arial, sans-serif;
-    overflow: hidden;
-  }
-
-  .booth {
-    width: 90%;
-    max-width: 420px;
-    text-align: center;
-  }
-
-  h1 { color: #b3003b; }
-  p { color: #800026; font-size: 14px; }
-
-  .photo-holder {
-    position: relative;
-    width: 100%;
-    height: 300px;
-    background: #fff0f5;
-    border: 3px dashed #b3003b;
-    border-radius: 20px;
-    margin: 20px 0;
-    overflow: hidden;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .photo {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    display: none;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .photo img {
-    max-width: 90%;
-    max-height: 90%;
-    object-fit: contain;
-    border-radius: 15px;
-    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
-  }
-
-  .wand {
-    width: 200px;
-    height: 20px;
-    background: #b3003b;
-    border-radius: 10px;
-    margin: 30px auto 0;
-    cursor: grab;
-    user-select: none;
-    transform-origin: center center;
-  }
-</style>
 </head>
 
 <body>
 
-<div class="booth">
-<h1>✨ HAPPY ANNIVERSARY BABYY ✨</h1>
-<p class="subtitle">keep winding to see our memories &lt;3</p>
+  <div class="booth">
+    <h1>✨ HAPPY ANNIVERSARY BABYY ✨</h1>
+    <p class="subtitle">keep winding to see our memories &lt;3</p>
 
-  <div class="photo-holder">
-    <div class="photo"><img src="IMG-01.jpg"></div>
-    <div class="photo"><img src="IMG-02.jpg"></div>
-    <div class="photo"><img src="IMG-03.jpg"></div>
-    <div class="photo"><img src="IMG-04.jpg"></div>
-    <div class="photo"><img src="IMG-05.jpg"></div>
-    <div class="photo"><img src="IMG-06.jpg"></div>
-    <div class="photo"><img src="IMG-07.jpg"></div>
-    <div class="photo"><img src="IMG-08.jpg"></div>
-    <div class="photo"><img src="IMG-09.jpg"></div>
-    <div class="photo"><img src="IMG-10.jpg"></div>
+    <div class="photo-holder">
+      <div class="photo"><img src="IMG-01.jpg"></div>
+      <div class="photo"><img src="IMG-02.jpg"></div>
+      <div class="photo"><img src="IMG-03.jpg"></div>
+      <div class="photo"><img src="IMG-04.jpg"></div>
+      <div class="photo"><img src="IMG-05.jpg"></div>
+      <div class="photo"><img src="IMG-06.jpg"></div>
+      <div class="photo"><img src="IMG-07.jpg"></div>
+      <div class="photo"><img src="IMG-08.jpg"></div>
+      <div class="photo"><img src="IMG-09.jpg"></div>
+      <div class="photo"><img src="IMG-10.jpg"></div>
+    </div>
+
+    <div class="wand" id="wand"></div>
   </div>
 
-  <div class="wand" id="wand"></div>
-</div>
+  <audio id="voice" src="voice.mp3" preload="auto"></audio>
 
-<audio id="voice" src="voice.mp3" preload="auto"></audio>
+  <script>
+    const wand = document.getElementById("wand");
+    const photos = document.querySelectorAll(".photo");
+    const audio = document.getElementById("voice");
 
-<script>
-  const wand = document.getElementById("wand");
-  const photos = document.querySelectorAll(".photo");
-  const audio = document.getElementById("voice");
+    let isDragging = false;
+    let lastAngle = 0;
+    let rotation = 0;
 
-  let isDragging = false;
-  let lastAngle = 0;
-  let rotation = 0;
-  let lastMoveTime = 0;
-  let revealed = 0;
-
-  function angleFromEvent(e) {
-    const r = wand.getBoundingClientRect();
-    const cx = r.left + r.width / 2;
-    const cy = r.top + r.height / 2;
-    return Math.atan2(e.clientY - cy, e.clientX - cx) * 180 / Math.PI;
-  }
-
-  wand.addEventListener("mousedown", e => {
-    isDragging = true;
-    lastAngle = angleFromEvent(e);
-  });
-
-  document.addEventListener("mousemove", e => {
-    if (!isDragging) return;
-
-    const angle = angleFromEvent(e);
-    const delta = angle - lastAngle;
-    lastAngle = angle;
-
-    if (Math.abs(delta) > 0.3) {
-      lastMoveTime = Date.now();
-      if (audio.paused) audio.play().catch(() => {});
+    function getAngle(e) {
+      const rect = wand.getBoundingClientRect();
+      const cx = rect.left + rect.width / 2;
+      const cy = rect.top + rect.height / 2;
+      return Math.atan2(e.clientY - cy, e.clientX - cx) * 180 / Math.PI;
     }
 
-    rotation += delta;
-    wand.style.transform = `rotate(${rotation}deg)`;
-  });
+    wand.addEventListener("mousedown", e => {
+      isDragging = true;
+      lastAngle = getAngle(e);
+    });
 
-  document.addEventListener("mouseup", stopAll);
-  document.addEventListener("mouseleave", stopAll);
+    document.addEventListener("mousemove", e => {
+      if (!isDragging) return;
 
-  function stopAll() {
-    isDragging = false;
-    audio.pause();
-  }
+      const angle = getAngle(e);
+      const delta = angle - lastAngle;
+      lastAngle = angle;
 
-  // 🔥 IMAGE REVEAL BASED ON AUDIO TIME
-  audio.addEventListener("timeupdate", () => {
-    if (!audio.duration) return;
+      if (Math.abs(delta) > 0.3) {
+        if (audio.paused) audio.play().catch(() => {});
+      }
 
-    const progress = audio.currentTime / audio.duration;
-    const shouldReveal = Math.floor(progress * photos.length);
+      rotation += delta;
+      wand.style.transform = `rotate(${rotation}deg)`;
+    });
 
-    for (let i = 0; i <= shouldReveal && i < photos.length; i++) {
-      photos[i].style.display = "flex";
+    function stopAll() {
+      isDragging = false;
+      audio.pause();
     }
-  });
-</script>
+
+    document.addEventListener("mouseup", stopAll);
+    document.addEventListener("mouseleave", stopAll);
+
+    // Reveal images slowly based on audio progress
+    audio.addEventListener("timeupdate", () => {
+      if (!audio.duration) return;
+
+      const progress = audio.currentTime / audio.duration;
+      const visibleCount = Math.floor(progress * photos.length);
+
+      photos.forEach((photo, index) => {
+        if (index <= visibleCount) {
+          photo.style.display = "flex";
+        }
+      });
+    });
+  </script>
 
 </body>
 </html>
